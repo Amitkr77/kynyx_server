@@ -4,12 +4,13 @@ const saveToGoogleSheet = require("../services/saveContactToGoogleSheet");
 
 const handleContact = async (req, res, next) => {
   try {
-    const { name, email, service, message, phone } = req.body;
+    const { name, email, service, message, phone, company } = req.body;
 
     const sanitized = {
       name: sanitizeInput(name),
       email: sanitizeInput(email),
       service: sanitizeInput(service),
+      company: sanitizeInput(company),
       message: sanitizeInput(message),
       phone: phone ? sanitizeInput(phone) : "Not provided",
     };

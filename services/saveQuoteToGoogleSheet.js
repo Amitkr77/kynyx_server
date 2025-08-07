@@ -1,62 +1,66 @@
 const { google } = require("googleapis");
 const credentials = require("../config/google-credentials.json");
 
+const SHEET_ID = process.env.QUOTE_SHEET_ID; 
+const SHEET_NAME = "Consultations"; 
 const auth = new google.auth.GoogleAuth({
   credentials,
   scopes: ["https://www.googleapis.com/auth/spreadsheets"],
 });
 
-const SHEET_ID = process.env.QUOTE_SHEET_ID;
-
-const saveQuoteToGoogleSheet = async (data) => {
+const saveToGoogleSheet = async (data) => {
   const client = await auth.getClient();
   const sheets = google.sheets({ version: "v4", auth: client });
 
-  const headerValues = [
-    ["NAME", "EMAIL", "PHONE", "SERVICES", "BUDGET", "TIMELINE", "DESCRIPTION", "DATE CREATED"],
+  const header = [
+    "Name", "Email", "Phone", "Company", "Website",
+    "Services", "Other Service", "Project Details",
+    "Budget", "File URL", "Submitted At"
   ];
 
-  const userRow = [
+  const values = [[
     data.name,
     data.email,
-    data.phone || "",
-    data.service,
+    data.phone,
+    data.company,
+    data.website,
+    data.services,
+    data.otherService,
+    data.projectDetails,
     data.budget,
-    data.timeline,
-    data.description,
-    new Date().toISOString(),
-  ];
+    data.fileUrl,
+    new Date().toLocaleString("en-IN", { timeZone: "Asia/Kolkata" })
+  ]];
 
-  // First, get existing values to check if header exists
-  const existing = await sheets.spreadsheets.values.get({
+  // Check and format header only if not already set
+  const getHeader = await sheets.spreadsheets.values.get({
     spreadsheetId: SHEET_ID,
-    range: "Quotes!A1:H1",
+    range: `${SHEET_NAME}!A1:1`,
   });
 
-  if (!existing.data.values || existing.data.values.length === 0) {
-    // Insert headers
+  const sheetHasHeader = getHeader.data.values?.length > 0;
+
+  if (!sheetHasHeader) {
     await sheets.spreadsheets.values.update({
       spreadsheetId: SHEET_ID,
-      range: "Quotes!A1:H1",
-      valueInputOption: "USER_ENTERED",
-      requestBody: {
-        values: headerValues,
+      range: `${SHEET_NAME}!A1`,
+      valueInputOption: "RAW",
+      resource: {
+        values: [header],
       },
     });
 
-    // Apply bold and background formatting to header
+    // Apply header formatting
     await sheets.spreadsheets.batchUpdate({
       spreadsheetId: SHEET_ID,
-      requestBody: {
+      resource: {
         requests: [
           {
             repeatCell: {
               range: {
-                sheetId: 0, // assumes first sheet
+                sheetId: 0, // Default sheet/tab ID, change if needed
                 startRowIndex: 0,
-                endRowIndex: 1,
-                startColumnIndex: 0,
-                endColumnIndex: 8,
+                endRowIndex: 1
               },
               cell: {
                 userEnteredFormat: {
@@ -64,13 +68,13 @@ const saveQuoteToGoogleSheet = async (data) => {
                     bold: true,
                   },
                   backgroundColor: {
-                    red: 0.98,
-                    green: 0.76,
-                    blue: 0.09, 
+                    red: 0.95,
+                    green: 0.85,
+                    blue: 0.75,
                   },
                 },
               },
-              fields: "userEnteredFormat(textFormat, backgroundColor)",
+              fields: "userEnteredFormat(backgroundColor,textFormat)",
             },
           },
         ],
@@ -78,15 +82,16 @@ const saveQuoteToGoogleSheet = async (data) => {
     });
   }
 
-  // Append new row
+  // Append form data
   await sheets.spreadsheets.values.append({
     spreadsheetId: SHEET_ID,
-    range: "Quotes!A:H",
-    valueInputOption: "USER_ENTERED",
-    requestBody: {
-      values: [userRow],
+    range: `${SHEET_NAME}!A1`,
+    valueInputOption: "RAW",
+    insertDataOption: "INSERT_ROWS",
+    resource: {
+      values,
     },
   });
 };
 
-module.exports = saveQuoteToGoogleSheet;
+module.exports = saveToGoogleSheet;

@@ -6,7 +6,7 @@ const auth = new google.auth.GoogleAuth({
   scopes: ["https://www.googleapis.com/auth/spreadsheets"],
 });
 
-const saveToGoogleSheet = async ({ name, email, service, message, phone }) => {
+const saveToGoogleSheet = async ({ name, email, service, message, phone, company }) => {
   const client = await auth.getClient();
   const sheets = google.sheets({ version: "v4", auth: client });
 
@@ -25,10 +25,10 @@ const saveToGoogleSheet = async ({ name, email, service, message, phone }) => {
   if (isEmpty) {
     await sheets.spreadsheets.values.update({
       spreadsheetId,
-      range: `${sheetName}!A1:F1`,
+      range: `${sheetName}!A1:G1`,
       valueInputOption: "RAW",
       resource: {
-        values: [["NAME", "EMAIL", "PHONE", "SERVICE OPTED", "DESCRPTION", "DATE"]],
+        values: [["NAME", "EMAIL", "PHONE", "COMPANY", "SERVICE OPTED", "DESCRPTION", "DATE"]],
       },
     });
 
@@ -48,7 +48,7 @@ const saveToGoogleSheet = async ({ name, email, service, message, phone }) => {
                   startRowIndex: 0,
                   endRowIndex: 1,
                   startColumnIndex: 0,
-                  endColumnIndex: 6,
+                  endColumnIndex: 7,
                 },
                 cell: {
                   userEnteredFormat: {
@@ -72,13 +72,15 @@ const saveToGoogleSheet = async ({ name, email, service, message, phone }) => {
   }
 
   // Append new row
-  const now = new Date().toLocaleString();
+  const now = new Date().toLocaleString("en-IN", {
+   timeZone: "Asia/Kolkata",
+  });
   await sheets.spreadsheets.values.append({
     spreadsheetId,
-    range: `${sheetName}!A:E`,
+    range: `${sheetName}!A:F`,
     valueInputOption: "RAW",
     resource: {
-      values: [[name, email, phone, service, message, now]],
+      values: [[name, email, phone, company, service, message, now]],
     },
   });
 };
