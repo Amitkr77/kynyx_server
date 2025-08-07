@@ -1,5 +1,14 @@
 const { google } = require("googleapis");
-const credentials = require("../config/google-credentials.json");
+// Decode the base64-encoded credentials from the environment variable
+const credentialsBase64 = process.env.GOOGLE_CREDENTIALS_BASE64;
+
+if (!credentialsBase64) {
+  console.error("GOOGLE_CREDENTIALS_BASE64 environment variable is not set");
+  process.exit(1);
+}
+
+// Decode the credentials from base64 to JSON
+const credentials = JSON.parse(Buffer.from(credentialsBase64, "base64").toString("utf-8"));
 
 const auth = new google.auth.GoogleAuth({
   credentials,
@@ -73,7 +82,7 @@ const saveToGoogleSheet = async ({ name, email, service, message, phone, company
 
   // Append new row
   const now = new Date().toLocaleString("en-IN", {
-   timeZone: "Asia/Kolkata",
+    timeZone: "Asia/Kolkata",
   });
   await sheets.spreadsheets.values.append({
     spreadsheetId,
