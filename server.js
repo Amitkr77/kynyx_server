@@ -1,11 +1,10 @@
 const express = require("express");
-require("dotenv").config();
+require('dotenv').config({ path: './.env' });
 const cors = require("cors");
 const contactRoutes = require("./routes/contact.route");
 const careerRoute = require("./routes/career.route");
 const quoteRoute = require("./routes/quote.route");
 const errorHandler = require("./middlewares/errorHandler");
-
 
 const app = express();
 
@@ -22,7 +21,6 @@ app.use(errorHandler);
 
 const PORT = process.env.URI_PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
-
 
 app.use("/sunnlo", (req, res) => {
     res.send("Sunn liya meeine");
