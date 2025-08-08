@@ -5,7 +5,7 @@ const { google } = require("googleapis");
 const credentialsBase64 = process.env.GOOGLE_CREDENTIALS_BASE64;
 
 if (!credentialsBase64) {
-  console.error("GOOGLE_CREDENTIALS_BASE64 environment variable is not set");
+  console.error("GOOGLE_CREDENTIALS_BASE64 environment variable is not set --quote");
   process.exit(1);
 }
 
