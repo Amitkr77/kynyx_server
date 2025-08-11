@@ -25,3 +25,6 @@ app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 app.use("/sunnlo", (req, res) => {
     res.send("Sunn liya meeine");
 });
+app.get('/', (req, res) => {
+    res.send('Hello, world!');
+});
