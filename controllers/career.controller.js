@@ -19,7 +19,7 @@ const handleCareer = async (req, res, next) => {
     let resumeLink = "";
     if (req.file) {
       resumeLink = await uploadToDrive(
-        req.file.path,
+        req.file.buffer,
         req.file.originalname,
         req.file.mimetype,
         process.env.GOOGLE_DRIVE_FOLDER_ID
