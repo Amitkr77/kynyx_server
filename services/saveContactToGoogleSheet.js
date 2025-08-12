@@ -5,6 +5,8 @@ const credentialsBase64 = process.env.GOOGLE_CREDENTIALS_BASE64;
 if (!credentialsBase64) {
   console.error("GOOGLE_CREDENTIALS_BASE64 environment variable is not set --contact");
   process.exit(1);
+}else{
+  console.log((JSON.parse(Buffer.from(credentialsBase64, "base64").toString("utf-8"))).type);
 }
 
 // Decode the credentials from base64 to JSON
