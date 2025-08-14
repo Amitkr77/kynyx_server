@@ -1,19 +1,16 @@
 const { google } = require("googleapis");
-const fs = require("fs");
-const path = require("path");
+const { PassThrough } = require("stream");
 
-// Decode the base64-encoded credentials from the environment variable
+// Decode credentials from env
 const credentialsBase64 = process.env.GOOGLE_CREDENTIALS_BASE64;
 
 if (!credentialsBase64) {
-  console.error("GOOGLE_CREDENTIALS_BASE64 environment variable is not set -quote file");
+  console.error("GOOGLE_CREDENTIALS_BASE64 environment variable is not set - quote file");
   process.exit(1);
 }
 
-// Decode the credentials from base64 to JSON
 const credentials = JSON.parse(Buffer.from(credentialsBase64, "base64").toString("utf-8"));
 
-// Create the GoogleAuth instance using the decoded credentials
 const auth = new google.auth.GoogleAuth({
   credentials,
   scopes: ["https://www.googleapis.com/auth/drive"],
@@ -24,6 +21,10 @@ const drive = google.drive({ version: "v3", auth });
 const uploadToDrive = async (file) => {
   const folderId = process.env.QUOTE_FILE_DRIVE_ID;
 
+  // Convert file buffer to stream
+  const bufferStream = new PassThrough();
+  bufferStream.end(file.buffer);
+
   const fileMetadata = {
     name: file.originalname,
     parents: [folderId],
@@ -31,7 +32,7 @@ const uploadToDrive = async (file) => {
 
   const media = {
     mimeType: file.mimetype,
-    body: fs.createReadStream(file.path),
+    body: bufferStream,
   };
 
   try {
@@ -42,13 +43,10 @@ const uploadToDrive = async (file) => {
     });
 
     // Make file public
-    await drive.permissions.create({
-      fileId: response.data.id,
-      requestBody: {
-        role: "reader",
-        type: "anyone",
-      },
-    });
+    // await drive.permissions.create({
+    //   fileId: response.data.id,
+    //   requestBody: { role: "reader", type: "anyone" },
+    // });
 
     return response.data;
   } catch (error) {
