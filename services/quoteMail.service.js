@@ -13,7 +13,7 @@ const sendQuoteEmail = async (data) => {
       <p><strong>Company name:</strong> ${data.company}</p>
       <p><strong>Website:</strong> ${data.website}</p>
       <p><strong>Service:</strong> ${data.services}</p>
-      <p><strong>Other service:</strong> ${data.otherServices || ""}</p>
+      <p><strong>Other service:</strong> ${data.otherService || ""}</p>
       <p><strong>project details:</strong> ${data.projectDetails || ""}</p>
       <p><strong>Budget:</strong> ${data.budget}</p>
       <p><strong>Reference file:</strong> ${data.fileUrl || ""}</p>
