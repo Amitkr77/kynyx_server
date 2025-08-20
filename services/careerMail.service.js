@@ -2,8 +2,8 @@ const transporter = require("../config/mail.config");
 
 const sendCareerEmail = async (application) => {
   const mailOptions = {
-    from: `Kynyx Job Applications - <no-reply@homeasy.io>`,
-    to: process.env.COMPANY_EMAIL,
+    from: `Kynyx Job Applications  <noreply@kynyx.com>`,
+    to: process.env.TO_EMAIL,
     subject: `Job Application for: ${application.position}`,
     html: `
       <h3>Contact Applicant Details</h3>

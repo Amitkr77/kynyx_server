@@ -2,8 +2,8 @@ const transporter = require("../config/mail.config");
 
 const sendQuoteEmail = async (data) => {
   const mailOptions = {
-    from: process.env.NO_REPLY_EMAIL,
-    to: process.env.COMPANY_EMAIL,
+    from: `Kynyx Quote Request  <noreply@kynyx.com>`,
+    to: process.env.TO_EMAIL,
     subject: `New Quote Request from - ${data.name}`,
     html: `
       <h3>Quote Details</h3>
