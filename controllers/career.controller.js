@@ -1,4 +1,4 @@
-const uploadToDrive = require("../utils/uploadResumeToDrive");
+const uploadPDFBuffer = require("../utils/uploadResumeToDrive");
 const sendCareerEmail = require("../services/careerMail.service");
 const addToZohoSheet = require("../services/saveCareerToGoogleSheet");
 
@@ -17,14 +17,14 @@ const handleCareer = async (req, res, next) => {
 
     let resumeLink = "";
     if (req.file) {
-      resumeLink = await uploadToDrive(
+      resumeLink = await uploadPDFBuffer(
         req.file.buffer,
         req.file.originalname,
         req.file.mimetype,
-        process.env.GOOGLE_DRIVE_FOLDER_ID
+        // process.env.GOOGLE_DRIVE_FOLDER_ID
       );
     }
-
+  
     const formattedData = {
       NAME: name || "",
       EMAIL: email || "",
@@ -34,7 +34,7 @@ const handleCareer = async (req, res, next) => {
       LINKEDIN: linkedIn || "",
       PORTFOLIO: portfolio || "",
       REFERRAL: referral || "",
-      "RESUME LINK": resumeLink || "",
+      RESUME_LINK: resumeLink || "",
 };
 
 

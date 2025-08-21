@@ -15,7 +15,7 @@ const sendCareerEmail = async (application) => {
       <p><strong>LinkedIn profile:</strong><br>${application.LINKEDIN || ""}</p>
       <p><strong>Portfolio:</strong><br>${application.PORTFOLIO || ""}</p>
       <p><strong>How did you hear about us:</strong><br>${application.REFERRAL}</p>
-      <p><strong>Resume link:</strong><br>${application.RESUMELINK}</p>
+      <p><strong>Resume link:</strong><br>${application.RESUME_LINK}</p>
     `,
     replyTo: application.EMAIL,
   };

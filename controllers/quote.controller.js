@@ -1,5 +1,5 @@
 const sanitize = require("../utils/sanitize");
-const uploadToDrive = require("../utils/uploadQuoteFileToDrive");
+const uploadPDFBuffer = require("../utils/uploadResumeToDrive");
 const addToZohoSheet = require("../services/saveQuoteToGoogleSheet");
 const sendEmail = require("../services/quoteMail.service"); 
 
@@ -24,8 +24,12 @@ const handleBookConsultation = async (req, res, next) => {
     // Upload file to Google Drive
     let fileUrl = "";
     if (req.file) {
-      const uploadedFile = await uploadToDrive(req.file);
-      fileUrl = uploadedFile.webViewLink;
+      fileUrl = await uploadPDFBuffer(
+        req.file.buffer,
+        req.file.originalname,
+        req.file.mimetype,
+        // process.env.GOOGLE_DRIVE_FOLDER_ID
+      );
     }
 
     await sendEmail({ ...data, fileUrl });
