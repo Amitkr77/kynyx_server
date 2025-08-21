@@ -1,108 +1,59 @@
-const { google } = require("googleapis");
-// const credentials = require("../config/google-credentials.json");
+require('dotenv').config();
+const axios = require('axios');
 
-// Decode the base64-encoded credentials from the environment variable
-const credentialsBase64 = process.env.GOOGLE_CREDENTIALS_BASE64;
+// --- Load environment variables ---
+const {
+  CLIENT_ID,
+  CLIENT_SECRET,
+  REFRESH_TOKEN,
+  SHEET_ID: SPREADSHEET_ID,
+  QUOTE_WORKSHEET_NAME,
+} = process.env;
 
-if (!credentialsBase64) {
-  console.error("GOOGLE_CREDENTIALS_BASE64 environment variable is not set --quote");
-  process.exit(1);
-}
+const tokenUrl = 'https://accounts.zoho.in/oauth/v2/token';
 
-// Decode the credentials from base64 to JSON
-const credentials = JSON.parse(Buffer.from(credentialsBase64, "base64").toString("utf-8"));
-
-const SHEET_ID = process.env.QUOTE_SHEET_ID;
-const SHEET_NAME = "Consultations";
-const auth = new google.auth.GoogleAuth({
-  credentials,
-  scopes: ["https://www.googleapis.com/auth/spreadsheets"],
-});
-
-const saveToGoogleSheet = async (data) => {
-  const client = await auth.getClient();
-  const sheets = google.sheets({ version: "v4", auth: client });
-
-  const header = [
-    "Name", "Email", "Phone", "Company", "Website",
-    "Services", "Other Service", "Project Details",
-    "Budget", "File URL", "Submitted At"
-  ];
-
-  const values = [[
-    data.name,
-    data.email,
-    data.phone,
-    data.company,
-    data.website,
-    data.services,
-    data.otherService,
-    data.projectDetails,
-    data.budget,
-    data.fileUrl,
-    new Date().toLocaleString("en-IN", { timeZone: "Asia/Kolkata" })
-  ]];
-
-  // Check and format header only if not already set
-  const getHeader = await sheets.spreadsheets.values.get({
-    spreadsheetId: SHEET_ID,
-    range: `${SHEET_NAME}!A1:1`,
-  });
-
-  const sheetHasHeader = getHeader.data.values?.length > 0;
-
-  if (!sheetHasHeader) {
-    await sheets.spreadsheets.values.update({
-      spreadsheetId: SHEET_ID,
-      range: `${SHEET_NAME}!A1`,
-      valueInputOption: "RAW",
-      resource: {
-        values: [header],
-      },
-    });
-
-    // Apply header formatting
-    await sheets.spreadsheets.batchUpdate({
-      spreadsheetId: SHEET_ID,
-      resource: {
-        requests: [
-          {
-            repeatCell: {
-              range: {
-                sheetId: 0, // Default sheet/tab ID, change if needed
-                startRowIndex: 0,
-                endRowIndex: 1
-              },
-              cell: {
-                userEnteredFormat: {
-                  textFormat: {
-                    bold: true,
-                  },
-                  backgroundColor: {
-                    red: 0.95,
-                    green: 0.85,
-                    blue: 0.75,
-                  },
-                },
-              },
-              fields: "userEnteredFormat(backgroundColor,textFormat)",
-            },
-          },
-        ],
-      },
-    });
-  }
-
-  // Append form data
-  await sheets.spreadsheets.values.append({
-    spreadsheetId: SHEET_ID,
-    range: `${SHEET_NAME}!A1`,
-    valueInputOption: "RAW",
-    insertDataOption: "INSERT_ROWS",
-    resource: {
-      values,
+/**
+ * Get a Zoho access token using the refresh token
+ */
+async function getAccessToken() {
+  const response = await axios.post(tokenUrl, null, {
+    params: {
+      refresh_token: REFRESH_TOKEN,
+      client_id: CLIENT_ID,
+      client_secret: CLIENT_SECRET,
+      grant_type: 'refresh_token',
     },
   });
-};
 
-module.exports = saveToGoogleSheet;
+  return response.data.access_token;
+}
+
+/**
+ * Appends form data to the Zoho Sheet
+ * @param {Object} formData
+ */
+async function addToZohoSheet(formData) {
+  const accessToken = await getAccessToken();
+
+  const url = `https://sheet.zoho.in/api/v2/${SPREADSHEET_ID}?method=worksheet.records.add&worksheet_name=${QUOTE_WORKSHEET_NAME}`;
+
+  const payload = new URLSearchParams({
+    json_data: JSON.stringify([formData]),
+  });
+
+  const config = {
+    headers: {
+      Authorization: `Zoho-oauthtoken ${accessToken}`,
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+  };
+
+  const response = await axios.post(url, payload, config);
+
+  if (response.data?.status !== 'success') {
+    throw new Error('Zoho Sheet insert failed.');
+  }
+
+}
+
+module.exports = addToZohoSheet ;

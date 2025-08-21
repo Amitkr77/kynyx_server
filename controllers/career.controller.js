@@ -1,9 +1,8 @@
 const uploadToDrive = require("../utils/uploadResumeToDrive");
 const sendCareerEmail = require("../services/careerMail.service");
-const saveCareerToSheet = require("../services/saveCareerToGoogleSheet");
+const addToZohoSheet = require("../services/saveCareerToGoogleSheet");
 
 const handleCareer = async (req, res, next) => {
-
   try {
     const {
       name,
@@ -26,20 +25,22 @@ const handleCareer = async (req, res, next) => {
       );
     }
 
-    const application = {
-      name,
-      email,
-      phone,
-      position,
-      github,
-      linkedIn,
-      portfolio,
-      referral,
-      resumeLink,
-    };
+    const formattedData = {
+      NAME: name || "",
+      EMAIL: email || "",
+      PHONE: phone || "",
+      POSITION: position || "",
+      GITHUB: github || "",
+      LINKEDIN: linkedIn || "",
+      PORTFOLIO: portfolio || "",
+      REFERRAL: referral || "",
+      "RESUME LINK": resumeLink || "",
+};
 
-    await sendCareerEmail(application);
-    await saveCareerToSheet(application);
+
+
+    await sendCareerEmail(formattedData);
+    await addToZohoSheet(formattedData);
 
     res.status(200).json({ message: "Application submitted!" });
   } catch (error) {

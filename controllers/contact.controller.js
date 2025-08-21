@@ -7,12 +7,12 @@ const handleContact = async (req, res, next) => {
     const { name, email, service, message, phone, company } = req.body;
 
     const sanitized = {
-  Name: sanitizeInput(name),
-  Email: sanitizeInput(email),
-  Service: sanitizeInput(service),
-  Company: sanitizeInput(company),
-  Message: sanitizeInput(message),
-  Phone: phone ? sanitizeInput(phone) : "Not provided",
+  NAME: sanitizeInput(name),
+  EMAIL: sanitizeInput(email),
+  SERVICE: sanitizeInput(service),
+  COMPANY: sanitizeInput(company),
+  MESSAGE: sanitizeInput(message),
+  PHONE: phone ? sanitizeInput(phone) : "Not provided",
 };
     await sendMail(sanitized);
     await addToZohoSheet(sanitized);

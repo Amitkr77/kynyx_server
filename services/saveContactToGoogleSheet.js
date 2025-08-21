@@ -7,7 +7,7 @@ const {
   CLIENT_SECRET,
   REFRESH_TOKEN,
   SHEET_ID: SPREADSHEET_ID,
-  WORKSHEET_NAME,
+  CONTACT_WORKSHEET_NAME,
 } = process.env;
 
 const tokenUrl = 'https://accounts.zoho.in/oauth/v2/token';
@@ -35,7 +35,7 @@ async function getAccessToken() {
 async function addToZohoSheet(formData) {
   const accessToken = await getAccessToken();
 
-  const url = `https://sheet.zoho.in/api/v2/${SPREADSHEET_ID}?method=worksheet.records.add&worksheet_name=${WORKSHEET_NAME}`;
+  const url = `https://sheet.zoho.in/api/v2/${SPREADSHEET_ID}?method=worksheet.records.add&worksheet_name=${CONTACT_WORKSHEET_NAME}`;
 
   const payload = new URLSearchParams({
     json_data: JSON.stringify([formData]),

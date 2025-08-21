@@ -1,6 +1,6 @@
 const sanitize = require("../utils/sanitize");
 const uploadToDrive = require("../utils/uploadQuoteFileToDrive");
-const saveToSheet = require("../services/saveQuoteToGoogleSheet");
+const addToZohoSheet = require("../services/saveQuoteToGoogleSheet");
 const sendEmail = require("../services/quoteMail.service"); 
 
 const handleBookConsultation = async (req, res, next) => {
@@ -29,7 +29,7 @@ const handleBookConsultation = async (req, res, next) => {
     }
 
     await sendEmail({ ...data, fileUrl });
-    await saveToSheet({ ...data, fileUrl });
+    await addToZohoSheet({ ...data, fileUrl });
 
     res.status(200).json({ message: "Consultation request submitted successfully!" });
   } catch (error) {
