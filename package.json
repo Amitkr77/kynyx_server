@@ -10,7 +10,11 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+<<<<<<< HEAD
     "cloudinary": "^2.7.0",
+=======
+  "axios": "^1.11.0",
+>>>>>>> 1cbb5a079053409e4d35aa938d30abfaedbced24
     "cors": "^2.8.5",
     "dotenv": "^17.2.1",
     "express": "^5.1.0",
