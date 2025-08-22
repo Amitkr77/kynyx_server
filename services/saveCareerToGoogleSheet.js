@@ -36,9 +36,19 @@ async function addToZohoSheet(formData) {
   const accessToken = await getAccessToken();
 
   const url = `https://sheet.zoho.in/api/v2/${SPREADSHEET_ID}?method=worksheet.records.add&worksheet_name=${CAREER_WORKSHEET_NAME}`;
+  
+  const istTime = new Date().toLocaleString('en-IN', {
+    timeZone: 'Asia/Kolkata',
+    hour12: false, 
+  });
+
+  const dataWithTimestamp = {
+    ...formData,
+    submitted_at: istTime, // Make sure your Zoho Sheet has a "submitted_at" column
+  };
 
   const payload = new URLSearchParams({
-    json_data: JSON.stringify([formData]),
+    json_data: JSON.stringify([dataWithTimestamp]),
   });
 
   const config = {
