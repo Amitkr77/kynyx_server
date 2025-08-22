@@ -5,8 +5,19 @@ const contactRoutes = require("./routes/contact.route");
 const careerRoute = require("./routes/career.route");
 const quoteRoute = require("./routes/quote.route");
 const errorHandler = require("./middlewares/errorHandler");
+const connectDB = require('./config/db');
+const authRoutes = require('./routes/auth.route');
+const blogRoutes = require('./routes/blog.route');
+const cloudinary = require('cloudinary').v2;
 
 const app = express();
+
+// Configure Cloudinary
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET
+});
 
 app.use(cors());
 app.use(express.json());
@@ -16,15 +27,18 @@ app.use("/api/contact", contactRoutes);
 app.use("/api/get-quote", quoteRoute);
 app.use("/api/career", careerRoute)
 
+app.use('/api/auth', authRoutes);
+app.use('/api/blog', blogRoutes);
+
 // Global error handler
 app.use(errorHandler);
+
+// Database connect
+connectDB();
 
 const PORT = process.env.URI_PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 
-app.use("/sunnlo", (req, res) => {
-    res.send("Sunn liya meeine");
-});
 app.get('/', (req, res) => {
-    res.send('Hello, world!');
+  res.send('Hello, world!');
 });
