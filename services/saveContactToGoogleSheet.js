@@ -1,12 +1,6 @@
 require('dotenv').config();
 const axios = require('axios');
 
-<<<<<<< HEAD
-if (!credentialsBase64) {
-  console.error("GOOGLE_CREDENTIALS_BASE64 environment variable is not set --contact");
-  process.exit(1);
-}
-=======
 // --- Load environment variables ---
 const {
   CLIENT_ID,
@@ -15,7 +9,6 @@ const {
   SHEET_ID: SPREADSHEET_ID,
   CONTACT_WORKSHEET_NAME,
 } = process.env;
->>>>>>> 1cbb5a079053409e4d35aa938d30abfaedbced24
 
 const tokenUrl = 'https://accounts.zoho.in/oauth/v2/token';
 
