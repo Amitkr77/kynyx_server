@@ -19,7 +19,15 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET
 });
 
-app.use(cors());
+// Enable CORS for your production domain
+app.use(cors({
+  origin: 'https://kynyx.com',  
+  methods: 'GET,POST,PUT,DELETE',
+  allowedHeaders: 'Content-Type,Authorization',
+  credentials: true,
+  preflightContinue: false,
+}));
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
