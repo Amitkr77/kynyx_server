@@ -63,51 +63,74 @@ exports.uploadImage = async (req, res) => {
 // Create a new blog
 exports.createBlog = async (req, res) => {
   try {
-    const { title, content, categories, tags, status, metadata, featuredImage, } = req.body;
+    const {
+      title,
+      content,
+      categories = [],
+      tags = [],
+      status = 'draft',
+      metadata = {},
+      featuredImage = ''
+    } = req.body;
 
-    // Sanitize inputs
-    const sanitizedTitle = sanitizeHtml(title, sanitizeOptions);
-    const sanitizedContent = sanitizeHtml(content, sanitizeOptions);
-    const slug = slugify(sanitizedTitle, { lower: true, strict: true })
-
-
-    // Validate required fields
-    if (!sanitizedTitle || !sanitizedContent) {
-      return sendErrorResponse(res, 400, 'Title and content are required');
+    // Validate and sanitize required fields
+    if (!title || !content || !metadata) {
+      return sendErrorResponse(res, 400, 'Title, content, and metadata are required.');
     }
+
+    const sanitizedTitle = sanitizeHtml(title, sanitizeOptions).trim();
+    const sanitizedContent = sanitizeHtml(content, sanitizeOptions).trim();
+
+    if (!sanitizedTitle || !sanitizedContent) {
+      return sendErrorResponse(res, 400, 'Sanitized title and content must not be empty.');
+    }
+
+    const slug = slugify(sanitizedTitle, { lower: true, strict: true });
+
+    // Sanitize metadata
+    const sanitizedMetadata = {
+      metaTitle: sanitizeHtml(metadata.metaTitle || '', sanitizeOptions).trim(),
+      metaDescription: sanitizeHtml(metadata.metaDescription || '', sanitizeOptions).trim(),
+      keywords: Array.isArray(metadata.keywords)
+        ? metadata.keywords.map(keyword => sanitizeHtml(keyword.trim(), sanitizeOptions))
+        : []
+    };
 
     // Validate featuredImage URL if provided
     if (featuredImage && !validator.isURL(featuredImage)) {
-      return sendErrorResponse(res, 400, 'Featured image must be a valid URL');
+      return sendErrorResponse(res, 400, 'Featured image must be a valid URL.');
     }
 
+    // Construct blog object
     const blogData = {
       title: sanitizedTitle,
       content: sanitizedContent,
       author: req.user.username,
-      categories: categories || [],
-      tags: tags || [],
-      status: status || 'draft',
-      metadata: metadata || {},
-      featuredImage: featuredImage || '',
-      slug: slug
+      categories,
+      tags,
+      status,
+      metadata: sanitizedMetadata,
+      featuredImage,
+      slug
     };
 
     const blog = new Blog(blogData);
     await blog.save();
-    res.status(201).json({
-      message: 'Blog created successfully',
+
+    return res.status(201).json({
+      message: 'Blog created successfully.',
       data: blog
     });
+
   } catch (err) {
     if (err.code === 11000) {
-      return sendErrorResponse(res, 400, 'Blog with this slug already exists');
+      return sendErrorResponse(res, 400, 'A blog with this slug already exists.');
     }
-    sendErrorResponse(res, 500, 'Error creating blog', err);
-    console.log(err);
-    
+    console.error('Error creating blog:', err);
+    return sendErrorResponse(res, 500, 'Internal server error while creating blog.', err);
   }
 };
+
 
 // Get all blogs with pagination and filtering
 exports.getAllBlogs = async (req, res) => {
