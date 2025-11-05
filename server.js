@@ -21,7 +21,7 @@ cloudinary.config({
 
 // Enable CORS for your production domain
 app.use(cors({
-  origin: 'https://kynyx.com',  
+  origin: 'http://localhost:8080',  
   methods: 'GET,POST,PUT,DELETE',
   allowedHeaders: 'Content-Type,Authorization',
   credentials: true,
