@@ -56,7 +56,10 @@ exports.uploadImage = async (req, res) => {
       publicId: result.public_id
     });
   } catch (err) {
+    console.error(err);
+    
     sendErrorResponse(res, 500, 'Error uploading image', err);
+    console.log("error while uploading the image",err);
   }
 };
 
