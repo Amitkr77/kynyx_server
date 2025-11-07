@@ -57,9 +57,9 @@ exports.uploadImage = async (req, res) => {
     });
   } catch (err) {
     console.error(err);
-    
+
     sendErrorResponse(res, 500, 'Error uploading image', err);
-    console.log("error while uploading the image",err);
+    console.log("error while uploading the image", err);
   }
 };
 
@@ -135,57 +135,76 @@ exports.createBlog = async (req, res) => {
 };
 
 
+// try {
+  //   const {
+  //     page = 1,
+  //     limit = 5,
+  //     status,
+  //     category,
+  //     tag,
+  //     search
+  //   } = req.query;
+
+  //   const currentPage = Number(page);
+  //   const pageLimit = Number(limit);
+
+  //   // Build base query
+  //   const query = {};
+
+  //   // Apply status, defaulting to 'published' if not provided
+  //   query.status = status || 'published';
+
+  //   // Apply category and tag filters
+  //   if (category) query.categories = category;
+  //   if (tag) query.tags = tag;
+
+  //   // Add search conditions if search is present
+  //   if (search) {
+  //     query.$or = [
+  //       { title: { $regex: search, $options: 'i' } },
+  //       { content: { $regex: search, $options: 'i' } },
+  //       { tags: { $regex: search, $options: 'i' } }
+  //     ];
+  //   }
+
+  //   // Fetch filtered and paginated blogs
+  //   const blogs = await Blog.find(query)
+  //     .skip((currentPage - 1) * pageLimit)
+  //     .limit(pageLimit)
+  //     .sort({ createdAt: -1 });
+
+  //   // Count total matching documents
+  //   const total = await Blog.countDocuments(query);
+
+  //   // Respond with blogs and pagination info
+  //   return res.status(200).json({
+  //     data: blogs, 
+  //     pagination: {
+  //       currentPage,
+  //       totalPages: Math.ceil(total / pageLimit),
+  //       totalBlogs: total
+  //     }
+  //   });
+  // } catch (err) {
+  //   console.error(`[BLOG FETCH ERROR]:`, err);
+
+  //   return res.status(500).json({
+  //     message: 'An error occurred while fetching blogs.',
+  //     error: err.message || err
+  //   });
+  // }
 // Get all blogs with pagination and filtering
 exports.getAllBlogs = async (req, res) => {
+  
+
   try {
-    const {
-      page = 1,
-      limit = 5,
-      status,
-      category,
-      tag,
-      search
-    } = req.query;
+    // Fetch all blogs without any filters or pagination
+    const blogs = await Blog.find()
+      .sort({ createdAt: -1 }); // You can sort by creation date or any other field
 
-    const currentPage = Number(page);
-    const pageLimit = Number(limit);
-
-    // Build base query
-    const query = {};
-
-    // Apply status, defaulting to 'published' if not provided
-    query.status = status || 'published';
-
-    // Apply category and tag filters
-    if (category) query.categories = category;
-    if (tag) query.tags = tag;
-
-    // Add search conditions if search is present
-    if (search) {
-      query.$or = [
-        { title: { $regex: search, $options: 'i' } },
-        { content: { $regex: search, $options: 'i' } },
-        { tags: { $regex: search, $options: 'i' } }
-      ];
-    }
-
-    // Fetch filtered and paginated blogs
-    const blogs = await Blog.find(query)
-      .skip((currentPage - 1) * pageLimit)
-      .limit(pageLimit)
-      .sort({ createdAt: -1 });
-
-    // Count total matching documents
-    const total = await Blog.countDocuments(query);
-
-    // Respond with blogs and pagination info
+    // Respond with the blog data
     return res.status(200).json({
       data: blogs,
-      pagination: {
-        currentPage,
-        totalPages: Math.ceil(total / pageLimit),
-        totalBlogs: total
-      }
     });
   } catch (err) {
     console.error(`[BLOG FETCH ERROR]:`, err);

@@ -97,18 +97,18 @@ const blogSchema = new mongoose.Schema({
     metaTitle: {
       type: String,
       trim: true,
-      maxlength: [70, 'Meta title cannot exceed 70 characters']
+      // maxlength: [70, 'Meta title cannot exceed 70 characters']
     },
     metaDescription: {
       type: String,
       trim: true,
-      maxlength: [160, 'Meta description cannot exceed 160 characters']
+      // maxlength: [160, 'Meta description cannot exceed 160 characters']
     },
     keywords: [{
       type: String,
       trim: true,
       lowercase: true,
-      maxlength: [50, 'Keyword cannot exceed 50 characters']
+      // maxlength: [50, 'Keyword cannot exceed 50 characters']
     }]
   },
   featuredImage: {
